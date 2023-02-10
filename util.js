@@ -28,4 +28,13 @@ function alternatingString(symbol1, symbol2, length) {
     return result
 }
 
-module.exports = {logError, logPositive, keepCharacters, alternatingString}
+function badPattern(s) {
+    pattern = "(.)[^\\1]*(?!\\1)(.)"
+    for(var i = 0; i < s; i++) {
+        pattern += (i % 2 == 0) ?  "[^\\1\\2]*(\\1)" : "[^\\1\\2]*(\\2)"
+    }
+    return new RegExp(pattern)
+}
+
+module.exports = {logError, logPositive, keepCharacters, alternatingString,
+                  badPattern}
