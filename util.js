@@ -29,9 +29,9 @@ function alternatingString(symbol1, symbol2, length) {
 }
 
 function badPattern(s) {
-    pattern = "(.)[^\\1]*(?!\\1)(.)"
+    pattern = "(.).*(?!\\1)(.)"
     for(var i = 0; i < s; i++) {
-        pattern += (i % 2 == 0) ?  "[^\\1\\2]*(\\1)" : "[^\\1\\2]*(\\2)"
+        pattern += (i % 2 == 0) ?  ".*(\\1)" : ".*(\\2)"
     }
     return new RegExp(pattern)
 }
