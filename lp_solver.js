@@ -16,7 +16,7 @@ Bounds
 2 <= x4 <= 3
 End`
 
-const PROBLEM2 = "Maximize \n obj: \n x1 \n Subject To \n c1: x1 <= 10 \n c2: x1 >= 11 \n End" 
+const PROBLEM2 = "Maximize \n obj: \n Aa \n Subject To \n c1: Aa <= 10 \n End" 
 
 async function test() {
     const highs = await highs_promise;
