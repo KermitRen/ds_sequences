@@ -1,0 +1,3 @@
+- Make sequenceToLineSegmentLP() more readable
+- Speed up pruneRedundantSequences()
+- Finish the data.csv file

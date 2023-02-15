@@ -2,7 +2,7 @@ const util = require("./util")
 
 const symbols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
-function genDSseq(n, s) {
+function genDSseq(n, s, log = false) {
     var queue = [{seq:"",count:0}]
     var results = []
     while(queue.length != 0) {
@@ -20,10 +20,13 @@ function genDSseq(n, s) {
         }
     }
 
-    const longestDSsequence = results[results.length - 1]
-    util.logPositive("Generated " + results.length + " sequences")
-    util.logPositive("Longest sequence is " + longestDSsequence)
-    util.logPositive("Longest sequence has length " + longestDSsequence.length)
+    if(log) {
+        const longestDSsequence = results[results.length - 1]
+        util.logPositive("Generated " + results.length + " sequences")
+        util.logPositive("Longest sequence is " + longestDSsequence)
+        util.logPositive("Longest sequence has length " + longestDSsequence.length)
+    }
+    return results
 }
 
 function isDSseqFast(sequence, n, s, log = false) {
@@ -43,6 +46,29 @@ function isDSseqFast(sequence, n, s, log = false) {
     
     if(log) {util.logPositive("" + sequence + " is a DS(" + n + ", " + s + ")-sequence")}
     return true
+}
+
+function pruneRedundantSequences(seqList) {
+    results = []
+    sequences = [...seqList]
+    var removed = 0
+    for(var i = 0; i < seqList.length; i++) {
+        var seq = sequences[i - removed]
+        var isRedundant = sequences.some(e => {
+            if(e == seq) { return false}
+            return util.isEquivalent(util.reverseString(seq), e) ||
+                   util.isEquivalent(seq, e.slice(0, -1)) ||
+                   util.isEquivalent(seq, e.slice(1, e.length))
+        })
+        if(isRedundant) {
+            sequences.splice(i - removed, 1)
+            removed++
+        } else {
+            results.push(seq)
+        }
+    }
+
+    return results
 }
 
 function isDSseq(sequence, n, s, log = false) {
@@ -68,4 +94,4 @@ function isDSseq(sequence, n, s, log = false) {
     return isDSseqFast(sequence, n, s, log)
 }
 
-module.exports = {symbols, genDSseq, isDSseq}
+module.exports = {symbols, genDSseq, isDSseq, pruneRedundantSequences}

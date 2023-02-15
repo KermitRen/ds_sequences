@@ -1,34 +1,49 @@
-const highs_settings = {
-    locateFile: (file) => "https://lovasoa.github.io/highs-js/" + file
-  };
+const util = require("./util")
+var highs = null
 
-const highs_promise = require("highs")(highs_settings)
-
-const PROBLEM = `Maximize
-obj:
-    x1 + 2 x2 + 4 x3 + x4
-Subject To
-c1: - x1 + x2 + x3 + 10 x4 <= 20
-c2: x1 - 4 x2 + x3 <= 30
-c3: x2 - 0.5 x4 = 0
-Bounds
-0 <= x1 <= 40
-2 <= x4 <= 3
-End`
-
-const PROBLEM2 = "Maximize \n obj: \n Aa \n Subject To \n c1: Aa <= 10 \n End" 
+const PROBLEM = "Maximize \n obj: \n Aa \n Subject To \n c1: Aa <= 10 \n End" 
 
 async function test() {
-    const highs = await highs_promise;
-    const sol = highs.solve(PROBLEM2);
-    console.log(sol)
+    const highs = await getHighs();
+    const sol = highs.solve(PROBLEM);
+    printSolution(sol)
 }
 
-async function solveLP(lp) {
-    const highs = await highs_promise;
+async function solveLP(lp, log = false) {
+    if(!highs) {
+        highs = await getHighs();
+    }
     const sol = highs.solve(lp)
-    console.log(sol)
+    if(log) { printSolution(sol) }
     return sol
+}
+
+async function getHighs() {
+    const highs_settings = {
+        locateFile: (file) => "https://lovasoa.github.io/highs-js/" + file
+    };
+    
+    const highs_promise = await require("highs")(highs_settings)
+    return highs_promise
+}
+
+function printSolution(sol) {
+    util.logPositive("Finished with status: " + sol.Status + "\n")
+
+    var count = 0
+    var str = ""
+    for (var x in sol.Columns) {
+        count++
+        if(count % 2 == 0) {
+            str = util.PadToLength(str, 18)
+            str += "" + x + ": " + sol.Columns[x].Primal 
+            util.logPositive(str)
+            str = ""
+        } else {
+            str += "" + x + ": " + sol.Columns[x].Primal 
+        }
+    }
+
 }
 
 module.exports = {test, solveLP}
