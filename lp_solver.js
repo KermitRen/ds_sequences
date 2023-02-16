@@ -1,12 +1,12 @@
 const util = require("./util")
 var highs = null
 
-const PROBLEM = "Maximize \n obj: \n Aa \n Subject To \n c1: Aa <= 10 \n End" 
+const PROBLEM = "Minimize \n obj: \n Aa \n Subject To \n c1: Aa <= 10 \n Bounds \n -infinity <= Aa <= infinity \n End" 
 
 async function test() {
     const highs = await getHighs();
     const sol = highs.solve(PROBLEM);
-    printSolution(sol)
+    console.log(sol)
 }
 
 async function solveLP(lp, log = false) {

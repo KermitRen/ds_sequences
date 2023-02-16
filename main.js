@@ -21,6 +21,6 @@ function gatherData(n, s) {
 const n3 = "ABACACBC" 
 const n4 = "ABCBADADBDCD"
 
-var lp = ds3lp.sequenceToLineSegmentLP(n3)
-lp_solver.solveLP(lp)
-*/
+var lp = ds3lp.toLineSegmentLP(n4)
+lp_solver.solveLP(lp, log = true)*/
+

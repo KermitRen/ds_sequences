@@ -48,29 +48,6 @@ function isDSseqFast(sequence, n, s, log = false) {
     return true
 }
 
-function pruneRedundantSequences(seqList) {
-    results = []
-    sequences = [...seqList]
-    var removed = 0
-    for(var i = 0; i < seqList.length; i++) {
-        var seq = sequences[i - removed]
-        var isRedundant = sequences.some(e => {
-            if(e == seq) { return false}
-            return util.isEquivalent(util.reverseString(seq), e) ||
-                   util.isEquivalent(seq, e.slice(0, -1)) ||
-                   util.isEquivalent(seq, e.slice(1, e.length))
-        })
-        if(isRedundant) {
-            sequences.splice(i - removed, 1)
-            removed++
-        } else {
-            results.push(seq)
-        }
-    }
-
-    return results
-}
-
 function isDSseq(sequence, n, s, log = false) {
 
     //Verify n
@@ -92,6 +69,29 @@ function isDSseq(sequence, n, s, log = false) {
 
     //Verify s
     return isDSseqFast(sequence, n, s, log)
+}
+
+function pruneRedundantSequences(seqList) {
+    results = []
+    sequences = [...seqList]
+    var removed = 0
+    for(var i = 0; i < seqList.length; i++) {
+        var seq = sequences[i - removed]
+        var isRedundant = sequences.some(e => {
+            if(e == seq) { return false}
+            return util.isEquivalent(util.reverseString(seq), e) ||
+                   util.isEquivalent(seq, e.slice(0, -1)) ||
+                   util.isEquivalent(seq, e.slice(1, e.length))
+        })
+        if(isRedundant) {
+            sequences.splice(i - removed, 1)
+            removed++
+        } else {
+            results.push(seq)
+        }
+    }
+
+    return results
 }
 
 module.exports = {symbols, genDSseq, isDSseq, pruneRedundantSequences}

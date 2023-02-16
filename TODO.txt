@@ -1,6 +1,2 @@
-- Make sequenceToLineSegmentLP() more readable
 - Speed up pruneRedundantSequences()
 - Finish the data.csv file
-- Problem: Highs might not allow negative variable values.
-    * Maybe we can add bounds?
-    * It also sometimes doesn't print a solution?

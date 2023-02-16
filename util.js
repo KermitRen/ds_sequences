@@ -56,6 +56,10 @@ function reverseString(s) {
     return s.split("").reverse().join("")
 }
 
+function sortString(s) {
+    return s.split("").sort().join("")
+}
+
 function alternatingString(symbol1, symbol2, length) {
     result = ""
     for(var i = 0; i < length; i++) {
@@ -72,5 +76,37 @@ function badPattern(s) {
     return new RegExp(pattern)
 }
 
+function getUniqueSymbols(seq) {
+    var symbols = []
+    for (var i = 0; i < seq.length; i++) {
+        if (!symbols.includes(seq[i])) {
+            symbols.push(seq[i])
+        }
+    }
+    return symbols
+}
+
+function getOccurenceMap(seq, symbols) {
+    var map = new Map()
+    for (var i = 0; i < symbols.length; i++) {
+        var symbol = symbols[i]
+        var first = seq.indexOf(symbol)
+        var last = seq.lastIndexOf(symbol)
+        map.set(symbol, {first: first, last: last})
+    }
+    return map
+}
+
+function getAllPairs(symbols) {
+    var pairs = []
+    for(var i = 0; i < symbols.length - 1; i++) {
+        for(var j = i + 1; j < symbols.length; j++) {
+            pairs.push(symbols[i] + symbols[j])
+        }
+    }
+    return pairs
+}
+
 module.exports = {logError, logPositive, keepCharacters, alternatingString,
-                  badPattern, isEquivalent, reverseString, PadToLength}
+                  badPattern, isEquivalent, reverseString, PadToLength, getUniqueSymbols,
+                  getOccurenceMap, sortString, getAllPairs}
