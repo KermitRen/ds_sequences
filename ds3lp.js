@@ -29,7 +29,7 @@ class lineSegment_lp {
 }
 
 function toLineSegmentLP(sequence) {
-    const epsilon = -0.001
+    const epsilon = -0.0001
     var lp = new lineSegment_lp()
     var symbols = util.getUniqueSymbols(sequence)
     var map = util.getOccurenceMap(sequence, symbols)
