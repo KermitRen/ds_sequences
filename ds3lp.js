@@ -87,4 +87,19 @@ function toLineSegmentLP(sequence) {
     return lp.getProgram()
 }
 
-module.exports = {toLineSegmentLP}
+function randomizeXcoord(lp, sequence) {
+    const breakPoints = sequence.length + 1
+    var newBreakPoints = [1]
+    for (var i = 0; i < breakPoints-1; i++) {
+        var diff = Math.random()*100000
+        newBreakPoints.push(newBreakPoints[i]+diff)
+    }
+
+    for (var i=0; i<breakPoints; i++) {
+        lp = lp.replaceAll(" "+(i+1) +" "," " + newBreakPoints[i] + " ")
+    }
+    
+    return lp
+}
+
+module.exports = {toLineSegmentLP, randomizeXcoord}

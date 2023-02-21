@@ -37,6 +37,23 @@ async function realizeSeqAsLineSegments(n) {
     }
 }
 
+async function test() {
+    const n3 = "ABACADADCBEBECEDE"
+    var lp = ds3lp.toLineSegmentLP(n3)
+    var randomLp = ds3lp.randomizeXcoord(lp, n3)
+    var solution = await lp_solver.solveLP(randomLp)
+    var counter = 0
+    while (solution.Status == "Infeasible" && counter < 10000) {
+        randomLp = ds3lp.randomizeXcoord(lp, n3)
+        solution = await lp_solver.solveLP(randomLp)
+        counter++
+        console.log(solution.Status)
+    }
+    console.log(solution)
+    console.log(counter)
+}
+
+test()
 /*
 var badSeq = []
 badSeq.push("ABCADCEBECEDE")
@@ -56,5 +73,3 @@ const n4 = "ABCBADADBDCD"
 var lp = ds3lp.toLineSegmentLP(n4)
 lp_solver.solveLP(lp, log = true)*/
 
-var results = ds.genDSseqPruned(5,3)
-console.log(results.length)
