@@ -1,3 +1,5 @@
+const symbols = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+
 function logError(message) {
     console.log('\u001b[' + 31 + 'm' + message + '\u001b[0m')
 }
@@ -36,6 +38,37 @@ function isEquivalent(seq1, seq2) {
     }
 
     return true
+}
+
+function toCanonical(seq) {
+    var result = ""
+    var symbolsUsed = 0
+    var symbolMap = new Map()
+    for(var i = 0; i < seq.length; i++) {
+        if(!symbolMap.has(seq[i])) {
+            symbolMap.set(seq[i], symbols[symbolsUsed])
+            symbolsUsed++
+        } 
+        result += symbolMap.get(seq[i])
+    }
+    return result
+}
+
+function binarySearch(list, x) {
+    var start = 0
+    var end = list.length - 1;
+        
+    while (start <= end){
+        var mid = Math.floor((start + end)/2);
+        if (list[mid] == x) {
+            return {found: true, index: mid}
+        } else if (list[mid] < x)
+            start = mid + 1;
+        else
+            end = mid - 1;
+    }
+
+    return {found: false}
 }
 
 function keepCharacters(string, charList, makeDS = false) {
@@ -109,4 +142,4 @@ function getAllPairs(symbols) {
 
 module.exports = {logError, logPositive, keepCharacters, alternatingString,
                   badPattern, isEquivalent, reverseString, PadToLength, getUniqueSymbols,
-                  getOccurenceMap, sortString, getAllPairs}
+                  getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch}

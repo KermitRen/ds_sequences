@@ -4,8 +4,12 @@ const lp_solver = require("./lp_solver")
 const ds3lp = require("./ds3lp")
 
 function gatherData(n, s) {
+    console.time('Gen Time');
     var DSSequences = ds.genDSseq(n,s)
-    var prunedDSSequences = ds.pruneRedundantSequences(DSSequences)
+    console.timeEnd('Gen Time');
+    console.time('Pruning Time');
+    var prunedDSSequences = []//ds.pruneRedundantSequences(DSSequences)
+    console.timeEnd('Pruning Time');
     var maxLength = DSSequences[DSSequences.length - 1].length
     var maxLengthSequences = DSSequences.filter(seq => seq.length == maxLength)
 
@@ -17,31 +21,9 @@ function gatherData(n, s) {
     util.logPositive("Found " + prunedDSSequences.length + " structurally different sequences")
 }
 
-/*
-const n3 = "ABACACBC" 
-const n4 = "ABCBADADBDCD"
-
-var lp = ds3lp.toLineSegmentLP(n4)
-lp_solver.solveLP(lp, log = true)*/
-    
-var badSeq = []
-badSeq.push("ABCADCEBECEDE")
-badSeq.push("ABACADCEBECEDE")
-badSeq.push("ABCADCBEBECEDE")
-badSeq.push("ABACADCBEBECEDE")
-badSeq.push("ABCADADCEBECEDE")
-badSeq.push("ABACADADCEBECEDE")
-badSeq.push("ABCADADCBEBECEDE")
-badSeq.push("ABACADADCBEBECEDE")
-
 async function realizeSeqAsLineSegments(n) {
     var DSSequences = ds.genDSseq(n,3)
-    console.log("Finished generating")
-    //var prunedDSSequences = ds.pruneRedundantSequences(DSSequences)
-    var prunedDSSequences = DSSequences.slice(-100,-1)
-    //var prunedDSSequences = badSeq
-    console.log("Finished pruning")
-    console.log(prunedDSSequences.length)
+    var prunedDSSequences = ds.pruneRedundantSequences(DSSequences)
 
     for (var i = 0; i < prunedDSSequences.length; i++) {
         var lp = ds3lp.toLineSegmentLP(prunedDSSequences[i])
@@ -55,4 +37,24 @@ async function realizeSeqAsLineSegments(n) {
     }
 }
 
-realizeSeqAsLineSegments(6)
+/*
+var badSeq = []
+badSeq.push("ABCADCEBECEDE")
+badSeq.push("ABACADCEBECEDE")
+badSeq.push("ABCADCBEBECEDE")
+badSeq.push("ABACADCBEBECEDE")
+badSeq.push("ABCADADCEBECEDE")
+badSeq.push("ABACADADCEBECEDE")
+badSeq.push("ABCADADCBEBECEDE")
+badSeq.push("ABACADADCBEBECEDE")
+*/
+
+/*
+const n3 = "ABACACBC" 
+const n4 = "ABCBADADBDCD"
+
+var lp = ds3lp.toLineSegmentLP(n4)
+lp_solver.solveLP(lp, log = true)*/
+
+var results = ds.genDSseqPruned(5,3)
+console.log(results.length)

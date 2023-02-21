@@ -29,6 +29,52 @@ function genDSseq(n, s, log = false) {
     return results
 }
 
+function genDSseqPruned(n, s) {
+    var queue = [{seq:"",count:0}]
+    var layers = []
+    var results = []
+    while(queue.length != 0) {
+        var element = queue.shift()
+        const validSymbols = symbols.slice(0, Math.min(n, element.count+1))
+        var isLeaf = true
+        for(var i=0; i < validSymbols.length; i++) {
+            if(element.seq.slice(-1) == validSymbols[i]) { continue }
+            var newSequence = element.seq + validSymbols[i]
+            var newCount = Math.min(n, element.count+(i == validSymbols.length - 1 ? 1 : 0))
+            if(newSequence.length < s + 2 || isDSseqFast(newSequence, newCount, s)) {
+                isLeaf = false
+                queue.push({seq:newSequence, count: newCount})
+                if(layers.length < newSequence.length) {
+                    layers.push([])
+                }
+                layers[newSequence.length - 1].push(newSequence)
+            }
+        }
+        if(isLeaf) {
+            results.push(element.seq)
+        }
+    }
+
+    const tempLength = results.length
+    var removed = 0
+    for(var i = 0; i < tempLength; i++) {
+        const sequence = results[i - removed]
+        const revSequence = util.toCanonical(util.reverseString(sequence))
+        const layer = layers[sequence.length - 1]
+        
+        if(sequence == revSequence) { continue }
+        var reverseStatus = util.binarySearch(layer, revSequence)
+        if(reverseStatus.found) {
+            results.splice(i - removed, 1)
+            removed++
+            normalStatus = util.binarySearch(layer, sequence)
+            layer.splice(normalStatus.index, 1)
+        }
+    }
+
+    return results
+}
+
 function isDSseqFast(sequence, n, s, log = false) {
     const lastSymbol = sequence.slice(-1)
     const subSymbols = symbols.slice(0, n)
@@ -94,4 +140,4 @@ function pruneRedundantSequences(seqList) {
     return results
 }
 
-module.exports = {symbols, genDSseq, isDSseq, pruneRedundantSequences}
+module.exports = {symbols, genDSseq, isDSseq, pruneRedundantSequences, genDSseqPruned}
