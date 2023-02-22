@@ -1,4 +1,3 @@
 - Finish the data.csv file
 - Cleanup toCubicLP()
 - speedup both LP's, by fixing first linesegment/cubic function
-- Visualization of solutions? (https://www.npmjs.com/package/function-plot)
