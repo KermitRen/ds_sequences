@@ -4,12 +4,9 @@ const lp_solver = require("./lp_solver")
 const ds3lp = require("./ds3lp")
 
 function gatherData(n, s) {
-    console.time('Gen Time');
-    var DSSequences = ds.genDSseq(n,s)
-    console.timeEnd('Gen Time');
-    console.time('Pruning Time');
-    var prunedDSSequences = []//ds.pruneRedundantSequences(DSSequences)
-    console.timeEnd('Pruning Time');
+    var DSData = ds.genDSseqPruned(n, s, verbose = true)
+    var DSSequences = DSData.all
+    var prunedDSSequences = DSData.pruned
     var maxLength = DSSequences[DSSequences.length - 1].length
     var maxLengthSequences = DSSequences.filter(seq => seq.length == maxLength)
 
@@ -53,18 +50,6 @@ async function test() {
     console.log(counter)
 }
 
-test()
-/*
-var badSeq = []
-badSeq.push("ABCADCEBECEDE")
-badSeq.push("ABACADCEBECEDE")
-badSeq.push("ABCADCBEBECEDE")
-badSeq.push("ABACADCBEBECEDE")
-badSeq.push("ABCADADCEBECEDE")
-badSeq.push("ABACADADCEBECEDE")
-badSeq.push("ABCADADCBEBECEDE")
-badSeq.push("ABACADADCBEBECEDE")
-*/
 
 /*
 const n3 = "ABACACBC" 
@@ -72,4 +57,3 @@ const n4 = "ABCBADADBDCD"
 
 var lp = ds3lp.toLineSegmentLP(n4)
 lp_solver.solveLP(lp, log = true)*/
-

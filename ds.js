@@ -29,7 +29,7 @@ function genDSseq(n, s, log = false) {
     return results
 }
 
-function genDSseqPruned(n, s) {
+function genDSseqPruned(n, s, verbose = false) {
     var queue = [{seq:"",count:0}]
     var layers = []
     var results = []
@@ -55,6 +55,15 @@ function genDSseqPruned(n, s) {
         }
     }
 
+    var allResults = []
+    if(verbose) {
+        for(var i = 0; i < layers.length; i++) {
+            for(var j = 0; j < layers[i].length; j++) {
+                allResults.push(layers[i][j])
+            }
+        }
+    }
+
     const tempLength = results.length
     var removed = 0
     for(var i = 0; i < tempLength; i++) {
@@ -72,7 +81,11 @@ function genDSseqPruned(n, s) {
         }
     }
 
-    return results
+    if(verbose) {
+        return {all: allResults, pruned: results}
+    } else {
+        return results 
+    }
 }
 
 function isDSseqFast(sequence, n, s, log = false) {

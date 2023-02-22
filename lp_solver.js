@@ -29,21 +29,32 @@ async function getHighs() {
 
 function printSolution(sol) {
     util.logPositive("Finished with status: " + sol.Status + "\n")
-
-    var count = 0
-    var str = ""
+    
+    var variables = []
     for (var x in sol.Columns) {
-        count++
-        if(count % 2 == 0) {
-            str = util.PadToLength(str, 18)
-            str += "" + x + ": " + sol.Columns[x].Primal 
+        variables.push({symbol: x, value: sol.Columns[x].Primal})
+    }
+    variables.sort((a, b) => {
+        if(a.symbol < b.symbol) {
+            return -1
+        } else if(a.symbol > b.symbol) {
+            return 1
+        } else {
+            return 0
+        }
+    })
+    
+    var startSymbol = variables[0].symbol[0]
+    var str = ""
+    for(var i = 0; i < variables.length; i++) {
+        if(variables[i].symbol[0] != startSymbol) {
             util.logPositive(str)
             str = ""
-        } else {
-            str += "" + x + ": " + sol.Columns[x].Primal 
-        }
+            startSymbol = variables[i].symbol[0]
+        } 
+        str += util.padToLength("" + variables[i].symbol + ": " + variables[i].value, 18)
     }
-
+    util.logPositive(str)
 }
 
 module.exports = {test, solveLP}

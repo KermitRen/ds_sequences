@@ -8,7 +8,7 @@ function logPositive(message) {
     console.log('\u001b[' + 32 + 'm' + message + '\u001b[0m')
 }
 
-function PadToLength(string, len) {
+function padToLength(string, len) {
     while(string.length < len) {
         string += " "
     }
@@ -52,6 +52,16 @@ function toCanonical(seq) {
         result += symbolMap.get(seq[i])
     }
     return result
+}
+
+function cubicEvalString(symbol, x, negative = false) {
+    str = negative ? "- " : ""
+    str += Math.pow(x,3) + " " + symbol + "a + " + Math.pow(x,2) + " " + symbol + "b + "
+    str += x + " " + symbol + "c + " + symbol + "d "
+    if(negative) {
+        str = str.replaceAll("+", "-")
+    }
+    return str
 }
 
 function binarySearch(list, x) {
@@ -141,5 +151,6 @@ function getAllPairs(symbols) {
 }
 
 module.exports = {logError, logPositive, keepCharacters, alternatingString,
-                  badPattern, isEquivalent, reverseString, PadToLength, getUniqueSymbols,
-                  getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch}
+                  badPattern, isEquivalent, reverseString, padToLength, getUniqueSymbols,
+                  getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch,
+                  cubicEvalString}
