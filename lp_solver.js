@@ -1,7 +1,7 @@
 const util = require("./util")
 var highs = null
 
-const PROBLEM = "Minimize \n obj: \n Aa \n Subject To \n c1: Aa <= 10 \n Bounds \n -infinity <= Aa <= infinity \n End" 
+const PROBLEM = "Maximize \n obj: \n Aa^2 \n Subject To \n c1: Aa <= 10 \n Bounds \n -infinity <= Aa <= infinity \n End" 
 
 async function test() {
     const highs = await getHighs();

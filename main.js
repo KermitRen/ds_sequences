@@ -51,9 +51,9 @@ async function test() {
 }
 
 
-/*
+
 const n3 = "ABACACBC" 
 const n4 = "ABCBADADBDCD"
 
-var lp = ds3lp.toLineSegmentLP(n4)
-lp_solver.solveLP(lp, log = true)*/
+var lp = ds3lp.toLineSegmentLP(n3)
+lp_solver.solveLP(lp, log = true)

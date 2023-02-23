@@ -101,10 +101,10 @@ function toCubicLP(sequence) {
 
     //Add Bounds
     for(var i = 0; i < symbols.length; i++) {
-        lp.addBound("-infinity <= " + symbols[i] + "a <= infinity")
-        lp.addBound("-infinity <= " + symbols[i] + "b <= infinity")
-        lp.addBound("-infinity <= " + symbols[i] + "c <= infinity")
-        lp.addBound("-infinity <= " + symbols[i] + "d <= infinity")
+        lp.addBound(symbols[i] + "a free")
+        lp.addBound(symbols[i] + "b free")
+        lp.addBound(symbols[i] + "c free")
+        lp.addBound(symbols[i] + "d free")
     }
 
     return lp.getProgram()
@@ -163,8 +163,8 @@ function toLineSegmentLP(sequence) {
 
     //Add Bounds
     for(var i = 0; i < symbols.length; i++) {
-        lp.addBound("-infinity <= " + symbols[i] + "a <= infinity")
-        lp.addBound("-infinity <= " + symbols[i] + "b <= infinity")
+        lp.addBound(symbols[i] + "a free")
+        lp.addBound(symbols[i] + "b free")
     }
 
     return lp.getProgram()
