@@ -19,8 +19,9 @@ function gatherData(n, s) {
 }
 
 async function realizeSeqAsLineSegments(n) {
-    var DSSequences = ds.genDSseq(n,3)
-    var prunedDSSequences = ds.pruneRedundantSequences(DSSequences)
+    //var DSSequences = ds.genDSseq(n,3)
+    //var prunedDSSequences = ds.pruneRedundantSequences(DSSequences)
+    var prunedDSSequences = ds.genDSseqPruned(n,3)
     var infeasibleSequences = []
 
     for (var i = 0; i < prunedDSSequences.length; i++) {
@@ -79,4 +80,4 @@ const n4 = "ABCBADADBDCD"
 //var lp = ds3lp.toCubicLP(n3)
 //lp_solver.solveLP(lp, log = true, cubic = true)
 
-realizeSeqAsLineSegments(5)
+realizeSeqAsLineSegments(6)
