@@ -9,12 +9,13 @@ async function test() {
     console.log(sol)
 }
 
-async function solveLP(lp, log = false) {
+async function solveLP(lp, log = false, cubic = false) {
     if(!highs) {
         highs = await getHighs();
     }
     const sol = highs.solve(lp)
     if(log) { printSolution(sol) }
+    if(cubic) { printCubicLP(sol) }
     return sol
 }
 
@@ -55,6 +56,33 @@ function printSolution(sol) {
         str += util.padToLength("" + variables[i].symbol + ": " + variables[i].value, 18)
     }
     util.logPositive(str)
+}
+
+function printCubicLP(sol) {
+    var variables = []
+    for (var x in sol.Columns) {
+        variables.push({symbol: x, value: sol.Columns[x].Primal})
+    }
+    variables.sort((a, b) => {
+        if(a.symbol < b.symbol) {
+            return -1
+        } else if(a.symbol > b.symbol) {
+            return 1
+        } else {
+            return 0
+        }
+    })
+    for (var i = 0; i < variables.length/4; i++) {
+        var str = variables[i*4].symbol[0] + "(x) = " 
+        for (var j = 0; j < 4; j++) {
+            var term = variables[i*4+j].value
+            if (term == 0) { continue }
+            var power = j == 3 ? "" : "x^" + (3-j)
+            str += term + power + " + "
+        }
+        str = str.slice(0,-3)
+        util.logPositive(str)
+    }
 }
 
 module.exports = {test, solveLP}

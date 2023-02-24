@@ -21,17 +21,38 @@ function gatherData(n, s) {
 async function realizeSeqAsLineSegments(n) {
     var DSSequences = ds.genDSseq(n,3)
     var prunedDSSequences = ds.pruneRedundantSequences(DSSequences)
+    var infeasibleSequences = []
 
     for (var i = 0; i < prunedDSSequences.length; i++) {
         var lp = ds3lp.toLineSegmentLP(prunedDSSequences[i])
         var solution = await lp_solver.solveLP(lp, log = false)
         if (solution.Status != "Optimal") {
-            util.logError(solution.Status)
-            console.log(prunedDSSequences[i])
-        } else {
-            util.logPositive(solution.Status)
+            //util.logError(solution.Status)
+            //console.log(prunedDSSequences[i])
+            infeasibleSequences.push(prunedDSSequences[i])
         }
     }
+    
+    util.logError("Found " + infeasibleSequences.length + " infeasible out of " + prunedDSSequences.length)
+    util.logError(infeasibleSequences)
+    const maxIterations = 1000
+    
+    var veryInfeasibleSequences = []
+    for (var i = 0; i < infeasibleSequences.length; i++) {
+        var counter = 0
+        var lp = ds3lp.toLineSegmentLP(infeasibleSequences[i])
+        var randomLp = ds3lp.randomizeXcoord(lp, infeasibleSequences[i])
+        var solution = await lp_solver.solveLP(randomLp)
+        while (solution.Status == "Infeasible" && counter < maxIterations) {
+            randomLp = ds3lp.randomizeXcoord(lp, infeasibleSequences[i])
+            solution = await lp_solver.solveLP(randomLp)
+            counter++
+        }
+        if (counter == 1000 ) {
+            veryInfeasibleSequences.push(infeasibleSequences[i])
+        }
+    }
+    util.logError("Very infeasible:\n" + veryInfeasibleSequences)
 }
 
 async function test() {
@@ -55,5 +76,7 @@ async function test() {
 const n3 = "ABACACBC" 
 const n4 = "ABCBADADBDCD"
 
-var lp = ds3lp.toLineSegmentLP(n3)
-lp_solver.solveLP(lp, log = true)
+//var lp = ds3lp.toCubicLP(n3)
+//lp_solver.solveLP(lp, log = true, cubic = true)
+
+realizeSeqAsLineSegments(5)
