@@ -19,25 +19,34 @@ function gatherData(n, s) {
 }
 
 async function realizeSeqAsLineSegments(n) {
-    //var DSSequences = ds.genDSseq(n,3)
-    //var prunedDSSequences = ds.pruneRedundantSequences(DSSequences)
+
+    console.log()
+    util.logPositive("Attempting to realize all DS(" + n + ", 3)-Sequenecs as line segments")
     var prunedDSSequences = ds.genDSseqPruned(n,3)
     var infeasibleSequences = []
+    util.logPositive("Finished generating " + prunedDSSequences.length + " sequences")
 
     for (var i = 0; i < prunedDSSequences.length; i++) {
         var lp = ds3lp.toLineSegmentLP(prunedDSSequences[i])
         var solution = await lp_solver.solveLP(lp, log = false)
         if (solution.Status != "Optimal") {
-            //util.logError(solution.Status)
-            //console.log(prunedDSSequences[i])
             infeasibleSequences.push(prunedDSSequences[i])
         }
     }
+    console.log()
+    if(infeasibleSequences.length == 0) {
+        util.logPositive("All sequences were realizable with fixed x-coordinates")
+        return
+    }
     
-    util.logError("Found " + infeasibleSequences.length + " infeasible out of " + prunedDSSequences.length)
+    const goodSequenceCount = prunedDSSequences.length - infeasibleSequences.length
+    util.logPositive("" + goodSequenceCount + " were realizable with fixed x-coordinates")
+    util.logError("The following " + infeasibleSequences.length + " were not:")
     util.logError(infeasibleSequences)
+
+    console.log()
+    util.logPositive("Attempting to realize remaining sequences with random x-coordinates")
     const maxIterations = 1000
-    
     var veryInfeasibleSequences = []
     for (var i = 0; i < infeasibleSequences.length; i++) {
         var counter = 0
@@ -53,31 +62,14 @@ async function realizeSeqAsLineSegments(n) {
             veryInfeasibleSequences.push(infeasibleSequences[i])
         }
     }
-    util.logError("Very infeasible:\n" + veryInfeasibleSequences)
-}
 
-async function test() {
-    const n3 = "ABACADADCBEBECEDE"
-    var lp = ds3lp.toLineSegmentLP(n3)
-    var randomLp = ds3lp.randomizeXcoord(lp, n3)
-    var solution = await lp_solver.solveLP(randomLp)
-    var counter = 0
-    while (solution.Status == "Infeasible" && counter < 10000) {
-        randomLp = ds3lp.randomizeXcoord(lp, n3)
-        solution = await lp_solver.solveLP(randomLp)
-        counter++
-        console.log(solution.Status)
+    if(veryInfeasibleSequences.length == 0) {
+        util.logPositive("All remaining sequences were realizable with random x-coordinates")
+        return
     }
-    console.log(solution)
-    console.log(counter)
+
+    util.logError("The following " + veryInfeasibleSequences.length + " sequences were still not realizable:")
+    util.logError(veryInfeasibleSequences)
 }
-
-
-
-const n3 = "ABACACBC" 
-const n4 = "ABCBADADBDCD"
-
-//var lp = ds3lp.toCubicLP(n3)
-//lp_solver.solveLP(lp, log = true, cubic = true)
 
 realizeSeqAsLineSegments(6)
