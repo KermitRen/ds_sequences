@@ -2,6 +2,8 @@ const util = require("./util")
 const ds = require("./ds")
 const lp_solver = require("./lp_solver")
 const ds3lp = require("./ds3lp")
+const ls = require("./line_segment")
+const poly = require("./polynomial")
 
 function gatherData(n, s) {
     var DSData = ds.genDSseqPruned(n, s, verbose = true)
@@ -27,7 +29,8 @@ async function realizeSeqAsLineSegments(n) {
     util.logPositive("Finished generating " + prunedDSSequences.length + " sequences")
 
     for (var i = 0; i < prunedDSSequences.length; i++) {
-        var lp = ds3lp.toLineSegmentLP(prunedDSSequences[i])
+        const lp_builder = ls.toLineSegmentLP(prunedDSSequences[i])
+        var lp = lp_builder.getProgram()
         var solution = await lp_solver.solveLP(lp, log = false)
         if (solution.Status != "Optimal") {
             infeasibleSequences.push(prunedDSSequences[i])
@@ -46,16 +49,18 @@ async function realizeSeqAsLineSegments(n) {
 
     console.log()
     util.logPositive("Attempting to realize remaining sequences with random x-coordinates")
-    const maxIterations = 1000
+    const maxIterations = 10000
     var veryInfeasibleSequences = []
     for (var i = 0; i < infeasibleSequences.length; i++) {
         var counter = 0
-        var lp = ds3lp.toLineSegmentLP(infeasibleSequences[i])
-        var randomLp = ds3lp.randomizeXcoord(lp, infeasibleSequences[i])
-        var solution = await lp_solver.solveLP(randomLp)
-        while (solution.Status == "Infeasible" && counter < maxIterations) {
-            randomLp = ds3lp.randomizeXcoord(lp, infeasibleSequences[i])
-            solution = await lp_solver.solveLP(randomLp)
+        const lp_builder = ls.toLineSegmentLP(infeasibleSequences[i])
+        lp_builder.randomizeXCoordinates()
+        var randomLP = lp_builder.getProgram()
+        var solution = await lp_solver.solveLP(randomLP)
+        while (solution.Status != "Optimal" && counter < maxIterations) {
+            lp_builder.randomizeXCoordinates()
+            randomLP = lp_builder.getProgram()
+            solution = await lp_solver.solveLP(randomLP)
             counter++
         }
         if (counter == 1000 ) {
@@ -72,4 +77,46 @@ async function realizeSeqAsLineSegments(n) {
     util.logError(veryInfeasibleSequences)
 }
 
-realizeSeqAsLineSegments(6)
+async function realizeSeqAsQuadratics(n) {
+    console.log()
+    util.logPositive("Attempting to realize all DS(" + n + ", 2)-Sequenecs as quadratic functions")
+    var DSSequences = ds.genDSseq(n, 2)
+    var infeasibleSequences = []
+    util.logPositive("Finished generating " + DSSequences.length + " sequences")
+
+    for (var i = 0; i < DSSequences.length; i++) {
+        if(DSSequences[i].length == 1) { continue }
+        const lp_builder = poly.toQuadraticLP(DSSequences[i])
+        const lp = lp_builder.getProgram()
+        const solution = await lp_solver.solveLP(lp)
+        if (solution.Status != "Optimal") {
+            infeasibleSequences.push(DSSequences[i])
+        }
+    }
+
+    console.log()
+    if(infeasibleSequences.length == 0) {
+        util.logPositive("All sequences were realizable with fixed x-coordinates")
+        return
+    } else {
+        const goodSequenceCount = DSSequences.length - infeasibleSequences.length
+        util.logPositive("" + goodSequenceCount + " were realizable with fixed x-coordinates")
+        util.logError("The following " + infeasibleSequences.length + " were not:")
+        util.logError(infeasibleSequences)
+    }
+}
+
+realizeSeqAsLineSegments(5)
+//realizeSeqAsQuadratics(1)
+
+async function test() {
+    const str = "ABCBA"
+    const lp_builder = ls.toLineSegmentLP(str)
+    lp_builder.randomizeXCoordinates()
+    const lp = lp_builder.getProgram()
+    const solution = await lp_solver.solveLP(lp, log = true)
+    console.log(lp_builder.coordinates)
+    ls.printLineSegments(solution)
+}
+
+//test()

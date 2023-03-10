@@ -1,5 +1,3 @@
 - Finish the data.csv file
-- Cleanup toCubicLP()
-- Generalize toCubicLP() to toPolynomialLP()
-    - Change file name of ds3lp file
-- speedup both LP's, by fixing first linesegment/cubic function
+- Create toCubicLP()
+- Line segment pretty print
