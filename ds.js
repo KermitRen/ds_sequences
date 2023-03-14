@@ -148,6 +148,20 @@ function prunelowerOrderSequences(seqList, n, s) {
     return seqList.filter(seq => !isDSseq(seq, n, s - 1))
 }
 
+function pruneReverse(seqList) {
+    return seqList.filter( s => {
+        if(s == util.toCanonical(util.reverseString(s))) {
+            return true
+        } else {
+            return s < util.toCanonical(util.reverseString(s))
+        }
+    })
+}
+
+function pruneForCubic(seqList, n) {
+   return pruneReverse(prunelowerOrderSequences(seqList, n, 3))
+}
+
 function pruneRedundantSequences(seqList) {
     results = []
     sequences = [...seqList]
@@ -172,4 +186,4 @@ function pruneRedundantSequences(seqList) {
 }
 
 module.exports = {symbols, genDSseq, isDSseq, pruneRedundantSequences, genDSseqPruned,
-                  prunelowerOrderSequences}
+                  prunelowerOrderSequences, pruneReverse, pruneForCubic}

@@ -109,7 +109,7 @@ async function realizeSeqAsQuadratics(n) {
 //realizeSeqAsLineSegments(5)
 
 async function test() {
-    const str = "ABACADADCBEBECEDE"
+    const str = "ABCADAEADCFBFCFDEF"
     const lp_builder = ls.toLineSegmentLP(str)
     lp_builder.randomizeXCoordinates()
     var lp = lp_builder.getProgram()
@@ -129,17 +129,5 @@ async function test() {
 
 //test()
 
-
 var seqs = ds.genDSseq(3,3)
-var seqs2 = ds.prunelowerOrderSequences(seqs,3,3)
-console.log(seqs2)
-console.log(seqs2.length)
-var seqs3 = seqs2.filter( s => {
-    if(s == util.toCanonical(util.reverseString(s))) {
-        return true
-    } else {
-        return s < util.toCanonical(util.reverseString(s))
-    }
-})
-console.log(seqs3)
-console.log(seqs3.length)
+var pruned = ds.pruneForCubic(seqs, 3)
