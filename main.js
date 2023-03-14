@@ -1,7 +1,6 @@
 const util = require("./util")
 const ds = require("./ds")
 const lp_solver = require("./lp_solver")
-const ds3lp = require("./ds3lp")
 const ls = require("./line_segment")
 const poly = require("./polynomial")
 
@@ -49,7 +48,7 @@ async function realizeSeqAsLineSegments(n) {
 
     console.log()
     util.logPositive("Attempting to realize remaining sequences with random x-coordinates")
-    const maxIterations = 10000
+    const maxIterations = 100000
     var veryInfeasibleSequences = []
     for (var i = 0; i < infeasibleSequences.length; i++) {
         var counter = 0
@@ -63,7 +62,8 @@ async function realizeSeqAsLineSegments(n) {
             solution = await lp_solver.solveLP(randomLP)
             counter++
         }
-        if (counter == 1000 ) {
+        console.log(counter)
+        if (counter == maxIterations ) {
             veryInfeasibleSequences.push(infeasibleSequences[i])
         }
     }
@@ -106,17 +106,40 @@ async function realizeSeqAsQuadratics(n) {
     }
 }
 
-realizeSeqAsLineSegments(5)
-//realizeSeqAsQuadratics(1)
+//realizeSeqAsLineSegments(5)
 
 async function test() {
-    const str = "ABCBA"
+    const str = "ABACADADCBEBECEDE"
     const lp_builder = ls.toLineSegmentLP(str)
     lp_builder.randomizeXCoordinates()
-    const lp = lp_builder.getProgram()
-    const solution = await lp_solver.solveLP(lp, log = true)
-    console.log(lp_builder.coordinates)
-    ls.printLineSegments(solution)
+    var lp = lp_builder.getProgram()
+    var solution = await lp_solver.solveLP(lp)
+    var counter = 0
+    while(solution.Status != "Optimal") {
+        lp_builder.randomizeXCoordinates()
+        var lp = lp_builder.getProgram()
+        var solution = await lp_solver.solveLP(lp)
+        counter++
+    }
+    console.log(solution.Status)
+    console.log(counter)
+    console.log()
+    ls.printLineSegments(solution, str, lp_builder)
 }
 
 //test()
+
+
+var seqs = ds.genDSseq(3,3)
+var seqs2 = ds.prunelowerOrderSequences(seqs,3,3)
+console.log(seqs2)
+console.log(seqs2.length)
+var seqs3 = seqs2.filter( s => {
+    if(s == util.toCanonical(util.reverseString(s))) {
+        return true
+    } else {
+        return s < util.toCanonical(util.reverseString(s))
+    }
+})
+console.log(seqs3)
+console.log(seqs3.length)

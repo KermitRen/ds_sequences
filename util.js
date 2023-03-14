@@ -183,7 +183,24 @@ function getIntersectionIntervals(sequence, pairs) {
     return intersectionIntervals
 }
 
+function getVariables(solution) {
+    var variables = []
+    for (var x in solution.Columns) {
+        variables.push({symbol: x, value: solution.Columns[x].Primal})
+    }
+    variables.sort((a, b) => {
+        if(a.symbol < b.symbol) {
+            return -1
+        } else if(a.symbol > b.symbol) {
+            return 1
+        } else {
+            return 0
+        }
+    })
+    return variables
+}
+
 module.exports = {logError, logPositive, keepCharacters, alternatingString,
                   badPattern, isEquivalent, reverseString, padToLength, getUniqueSymbols,
                   getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch,
-                  cubicEvalString, getIntersectionIntervals, symbols}
+                  cubicEvalString, getIntersectionIntervals, getVariables, symbols}

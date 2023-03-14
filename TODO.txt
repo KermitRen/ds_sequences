@@ -1,3 +1,2 @@
 - Finish the data.csv file
 - Create toCubicLP()
-- Line segment pretty print

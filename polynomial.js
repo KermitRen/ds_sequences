@@ -58,19 +58,7 @@ class lp_poly_builder {
 }
 
 function printPolynomials(solution, degree) {
-    var variables = []
-    for (var x in solution.Columns) {
-        variables.push({symbol: x, value: solution.Columns[x].Primal})
-    }
-    variables.sort((a, b) => {
-        if(a.symbol < b.symbol) {
-            return -1
-        } else if(a.symbol > b.symbol) {
-            return 1
-        } else {
-            return 0
-        }
-    })
+    var variables = util.getVariables(solution)
     util.logPositive("A(x) = 0")
     for (var i = 0; i < variables.length/(degree + 1); i++) {
         var str = variables[i*(degree+1)].symbol[0] + "(x) = " 

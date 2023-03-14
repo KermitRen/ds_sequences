@@ -16,7 +16,7 @@ class lp_ls_builder {
     randomizeXCoordinates() {
         var newCoordinates = [0]
         for(var i = 1; i < this.coordinates.length; i++) {
-            var diff = Math.random()*100
+            var diff = Math.random()*1
             newCoordinates.push(newCoordinates[i-1]+diff)
         }
         this.coordinates = newCoordinates
@@ -47,21 +47,8 @@ class lp_ls_builder {
     }
 }
 
-function printLineSegments(solution) {
-    var variables = []
-    for (var x in solution.Columns) {
-        variables.push({symbol: x, value: solution.Columns[x].Primal})
-    }
-    variables.sort((a, b) => {
-        if(a.symbol < b.symbol) {
-            return -1
-        } else if(a.symbol > b.symbol) {
-            return 1
-        } else {
-            return 0
-        }
-    })
-
+function printLines(solution) {
+    var variables = util.getVariables(solution)
     for (var i = 0; i < variables.length/(2); i++) {
         var str = variables[i*(2)].symbol[0] + "(x) = " 
         for (var j = 0; j < 2; j++) {
@@ -72,6 +59,23 @@ function printLineSegments(solution) {
         }
         str = str.slice(0,-3)
         str = str.replaceAll("e", "*10^")
+        util.logPositive(str)
+    }
+}
+
+function printLineSegments(solution, sequence, builder) {
+    const variables = util.getVariables(solution)
+    const coords = builder.coordinates
+
+    for (var i = 0; i < variables.length/2; i++) {
+        const symbol = variables[i*2].symbol[0]
+        const a = variables[i*2].value
+        const b = variables[i*2 + 1].value
+        const startX = coords[sequence.indexOf(symbol)]
+        const endX = coords[sequence.lastIndexOf(symbol) + 1]
+        const startPoint = "(" + startX + ", " + (a * startX + b) + ")"
+        const endPoint = "(" + endX + ", " + (a * endX + b) + ")"
+        var str = symbol + " = Segment(" + startPoint + ", " + endPoint + ")" 
         util.logPositive(str)
     }
 }
@@ -127,4 +131,4 @@ function toLineSegmentLP(sequence) {
     return lp
 }
 
-module.exports = {toLineSegmentLP, printLineSegments}
+module.exports = {toLineSegmentLP, printLines, printLineSegments}
