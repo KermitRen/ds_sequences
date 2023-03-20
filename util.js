@@ -54,13 +54,16 @@ function toCanonical(seq) {
     return result
 }
 
-function cubicEvalString(symbol, x, negative = false) {
-    str = negative ? "- " : ""
-    str += Math.pow(x,3) + " " + symbol + "a + " + Math.pow(x,2) + " " + symbol + "b + "
-    str += x + " " + symbol + "c + " + symbol + "d "
-    if(negative) {
-        str = str.replaceAll("+", "-")
+function polynomialToString(symbol, coef) {
+    var str = ""
+    for (var i=0; i<coef.length;i++) {
+        // if (coef[i]!=0) {
+            var power = (i==coef.length-1)?"":"x^"+(coef.length-i-1)
+            str += coef[i] + power + "+"
+        // } 
     }
+    str = str.replaceAll("+-", "-")
+    str = str.slice(0,-1)
     return str
 }
 
@@ -200,7 +203,47 @@ function getVariables(solution) {
     return variables
 }
 
+function printEndPointsOfLinesegmentsExcel(solution, sequence, breakpoints) {
+    var variables = []
+    for (var x in solution.Columns) {
+        variables.push({symbol: x, value: solution.Columns[x].Primal})
+    }
+    variables.sort((a, b) => {
+        if(a.symbol < b.symbol) {
+            return -1
+        } else if(a.symbol > b.symbol) {
+            return 1
+        } else {
+            return 0
+        }
+    })
+    var symbols = util.getUniqueSymbols(sequence)
+    var endpoints = util.getOccurenceMap(sequence, symbols)
+    console.log("Endpoints for linesegments " + symbols + ":")
+    var str = ""
+    for(var i = 0; i < symbols.length; i++) {
+        str += symbols[i] + "," + symbols[i] + ","
+    }
+    str += "\n"
+    for(var i = 0; i < variables.length/(2); i++) {
+        var currSymbol = variables[i*(2)].symbol[0]
+        var startX = breakpoints[endpoints.get(currSymbol).first]
+        var startY =  parseFloat(variables[i*2].value) * parseFloat(startX) + parseFloat(variables[i*2+1].value)
+        var endX = breakpoints[endpoints.get(currSymbol).last + 1]
+        var endY = parseFloat(variables[i*2].value) * parseFloat(endX) + parseFloat(variables[i*2+1].value)
+        for (var j = 1; j < i*2+1; j++) {
+            str += "0, "
+        }
+        str += startX + "," + startY + "\n"
+        for (var j = 1; j < i*2+1; j++) {
+            str += "0, "
+        }
+        str += endX + "," + endY + "\n\n" 
+    }
+    console.log(str)
+}
+
 module.exports = {logError, logPositive, keepCharacters, alternatingString,
                   badPattern, isEquivalent, reverseString, padToLength, getUniqueSymbols,
-                  getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch,
-                  cubicEvalString, getIntersectionIntervals, getVariables, symbols}
+                  getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch, 
+                  getIntersectionIntervals, getVariables, symbols, polynomialToString,printEndPointsOfLinesegmentsExcel}

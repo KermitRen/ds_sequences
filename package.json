@@ -9,6 +9,7 @@
   "author": "Christoffer Olsen, Emil Holmgren, Frederik Baggesen",
   "license": "ISC",
   "dependencies": {
-    "highs": "^0.7.3"
+    "highs": "^0.7.3",
+    "nerdamer": "^1.1.13"
   }
 }

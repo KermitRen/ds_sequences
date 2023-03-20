@@ -1,5 +1,11 @@
 const util = require("./util")
-
+// const cannot be used since nerdamer gets modified when other modules are loaded  
+var nerd = require('nerdamer'); 
+// Load additional modules. These are not required.  
+require('nerdamer/Algebra'); 
+require('nerdamer/Calculus'); 
+require('nerdamer/Solve'); 
+require('nerdamer/Extra');
 const EPSILON = -0.0001
 
 class lp_poly_builder {
@@ -183,4 +189,86 @@ function toCubicLP(sequence) {
     return lp
 }
 
-module.exports = {toQuadraticLP, toLineLP, toCubicLP, printPolynomials}
+function computeLowerEnvelope(solution, order) {
+    var variables = util.getVariables(solution)
+
+    for (var i=0; i<=order;i++) {
+        variables.splice(i, 0, {symbol: "A"+util.symbols[i].toLowerCase(), value: 0})    
+    }
+
+    var functions = []
+    for (var i = 0 ; i < variables.length/(order+1); i++) {
+        var coef = []
+        for (var j=0; j<=order; j++) {
+            coef.push(variables[i*(order+1)+j].value)
+        }
+        functions.push({name: variables[i*(order+1)].symbol[0], coefficients: coef})
+        functions[i].str = util.polynomialToString(functions[i].name, functions[i].coefficients)
+    }
+
+    // Find first symbol
+    var lowerEnv = ""
+    var candidates = [...functions]
+    for (var i=0; i<=order; i++) {
+        const even = (i%2 == 0)?1:-1
+        var best = []
+        for (var j=0; j<candidates.length; j++) {
+            var coef = {symbol: candidates[j].name, val: candidates[j].coefficients[i]}
+            if (best.length == 0) {
+                best.push(coef)
+            } else {
+                if (coef.val*even < best[0].val) {
+                    best = [coef]
+                } else if (coef.val*even == best[0].val) {
+                    best.push(coef)
+                }
+            }
+        }
+        if(best.length == 1) {
+            lowerEnv = best[0].symbol
+            break
+        } else {
+            candidates = candidates.filter(f => best.map(c => c.symbol).includes(f.name))
+        }
+    }
+
+    for (var i=0; i<functions.length; i++) {
+        var intersections = []
+        for (var j=0; j<functions.length; j++) {
+            if (i==j) {
+                continue
+            }
+            var temp = nerd.solve(functions[i].str + "=" + functions[j].str,"x").symbol.elements
+            var temp2 = temp.map(f=> {
+                return {x: (f.multiplier.num.value/f.multiplier.den.value), symbol: functions[j].name
+                }
+            })
+            intersections = intersections.concat(temp2)
+        }
+        intersections.sort((a,b)=>{
+            if(a.x < b.x) {
+                return -1
+            } else {
+                return 1
+            }
+        })
+        functions[i].intersections = intersections
+    }
+    var currX = 0
+    var currSym = lowerEnv[0]
+    while (true) {
+        const currFunction = functions.find(f=>f.name==currSym)
+        const firstIntersection = currFunction.intersections.find(int=>int.x>currX)
+        if (firstIntersection==null) {
+            break
+        } else {
+            currX = firstIntersection.x
+            currSym = firstIntersection.symbol
+            lowerEnv += currSym
+        }
+    }
+    console.log(lowerEnv)
+    return lowerEnv
+}
+
+module.exports = {toQuadraticLP, toLineLP, toCubicLP, printPolynomials, computeLowerEnvelope}
