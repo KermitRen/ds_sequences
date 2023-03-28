@@ -23,7 +23,7 @@ async function realizeSeqAsLineSegments(n) {
 
     console.log()
     util.logPositive("Attempting to realize all DS(" + n + ", 3)-Sequenecs as line segments")
-    var prunedDSSequences = ds.genDSseqPruned(n,3)
+    var prunedDSSequences = ds.genDSseqPruned(n, 3)
     var infeasibleSequences = []
     util.logPositive("Finished generating " + prunedDSSequences.length + " sequences")
 
@@ -83,6 +83,7 @@ async function realizeSeqAsQuadratics(n) {
     var DSSequences = ds.genDSseq(n, 2)
     var infeasibleSequences = []
     util.logPositive("Finished generating " + DSSequences.length + " sequences")
+    console.log()
 
     for (var i = 0; i < DSSequences.length; i++) {
         if(DSSequences[i].length == 1) { continue }
@@ -92,6 +93,12 @@ async function realizeSeqAsQuadratics(n) {
         if (solution.Status != "Optimal") {
             infeasibleSequences.push(DSSequences[i])
         }
+        /*
+        const computedLE = poly.computeLowerEnvelope(solution, 2)
+        if(computedLE != DSSequences[i]) {
+            util.logError("Mismatch between expected LE-sequence: " + DSSequences[i] + " and solution LE-sequence: " + computedLE)
+            poly.printPolynomials(solution, 2)
+        }*/
     }
 
     console.log()
@@ -106,29 +113,34 @@ async function realizeSeqAsQuadratics(n) {
     }
 }
 
-//realizeSeqAsLineSegments(5)
-
 async function test() {
-    const str = "ABC"
-    const lp_builder = poly.toQuadraticLP(str)
-    // lp_builder.randomizeXCoordinates()
+    const str = "ABCBDBABDCD"
+    const lp_builder = ls.toLineSegmentLP(str)
     var lp = lp_builder.getProgram()
     var solution = await lp_solver.solveLP(lp)
-    // var counter = 0
-    // while(solution.Status != "Optimal") {
-    //     lp_builder.randomizeXCoordinates()
-    //     var lp = lp_builder.getProgram()
-    //     var solution = await lp_solver.solveLP(lp)
-    //     counter++
-    // }
+    var counter = 0
+    while(solution.Status != "Optimal") {
+        lp_builder.randomizeXCoordinates()
+        var lp = lp_builder.getProgram()
+        var solution = await lp_solver.solveLP(lp)
+        counter++
+        if(counter%1000000 == 0) {
+            util.logError("1 million")
+        }
+    }
     console.log(solution.Status)
-    // console.log(counter)
-    // console.log()
-    poly.printPolynomials(solution, 2)
-    poly.computeLowerEnvelope(solution, 2)
+    console.log(counter)
+    console.log()
+    ls.printLineSegments(solution, str, lp_builder)
+    console.log()
+    util.logPositive("Spacing:")
+    ls.printSpacing(lp_builder)
 }
-
-test()
 
 // var seqs = ds.genDSseq(3,3)
 // var pruned = ds.pruneForCubic(seqs, 3)
+
+//realizeSeqAsLineSegments(5)
+test()
+//var seqs = ds.genDSseqPruned(4,3)
+//console.log(seqs.slice(-10,-1))

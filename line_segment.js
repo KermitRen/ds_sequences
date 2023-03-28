@@ -80,6 +80,15 @@ function printLineSegments(solution, sequence, builder) {
     }
 }
 
+function printSpacing(builder) {
+    const coords = builder.coordinates
+    var spacing = []
+    for(var i = 1; i < coords.length; i++) {
+        spacing.push(coords[i] - coords[i-1])
+    }
+    util.logPositive(spacing)
+}
+
 function evalLine(symbol, x, negative = false) {
     if(negative) {
         return "- " + x + " " + symbol + "a - " + symbol + "b " 
@@ -131,4 +140,5 @@ function toLineSegmentLP(sequence) {
     return lp
 }
 
-module.exports = {toLineSegmentLP, printLines, printLineSegments}
+module.exports = {toLineSegmentLP, printLines, printLineSegments,
+                  printSpacing}

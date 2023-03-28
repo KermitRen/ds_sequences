@@ -1,7 +1,5 @@
 const util = require("./util")
-// const cannot be used since nerdamer gets modified when other modules are loaded  
 var nerd = require('nerdamer'); 
-// Load additional modules. These are not required.  
 require('nerdamer/Algebra'); 
 require('nerdamer/Calculus'); 
 require('nerdamer/Solve'); 
@@ -189,27 +187,27 @@ function toCubicLP(sequence) {
     return lp
 }
 
-function computeLowerEnvelope(solution, order) {
+function computeLowerEnvelope(solution, degree) {
     var variables = util.getVariables(solution)
 
-    for (var i=0; i<=order;i++) {
+    for (var i=0; i<=degree;i++) {
         variables.splice(i, 0, {symbol: "A"+util.symbols[i].toLowerCase(), value: 0})    
     }
 
     var functions = []
-    for (var i = 0 ; i < variables.length/(order+1); i++) {
+    for (var i = 0 ; i < variables.length/(degree+1); i++) {
         var coef = []
-        for (var j=0; j<=order; j++) {
-            coef.push(variables[i*(order+1)+j].value)
+        for (var j=0; j<=degree; j++) {
+            coef.push(variables[i*(degree+1)+j].value)
         }
-        functions.push({name: variables[i*(order+1)].symbol[0], coefficients: coef})
+        functions.push({name: variables[i*(degree+1)].symbol[0], coefficients: coef})
         functions[i].str = util.polynomialToString(functions[i].name, functions[i].coefficients)
     }
 
     // Find first symbol
     var lowerEnv = ""
     var candidates = [...functions]
-    for (var i=0; i<=order; i++) {
+    for (var i=0; i<=degree; i++) {
         const even = (i%2 == 0)?1:-1
         var best = []
         for (var j=0; j<candidates.length; j++) {
@@ -240,14 +238,22 @@ function computeLowerEnvelope(solution, order) {
             }
             var temp = nerd.solve(functions[i].str + "=" + functions[j].str,"x").symbol.elements
             var temp2 = temp.map(f=> {
-                return {x: (f.multiplier.num.value/f.multiplier.den.value), symbol: functions[j].name
-                }
+                var int = {x: (f.multiplier.num.value/f.multiplier.den.value), symbol: functions[j].name}
+                var deriv = Number(nerd(nerd.diff(functions[j].str, "x"), {x: int.x}, "numer").text())
+                int.derivative = deriv
+                return int
             })
             intersections = intersections.concat(temp2)
         }
         intersections.sort((a,b)=>{
             if(a.x < b.x) {
                 return -1
+            } if(a.x == b.x) {
+                if(a.derivative < b.derivative) {
+                    return -1
+                } else {
+                    return 1
+                }
             } else {
                 return 1
             }
@@ -258,16 +264,14 @@ function computeLowerEnvelope(solution, order) {
     var currSym = lowerEnv[0]
     while (true) {
         const currFunction = functions.find(f=>f.name==currSym)
-        const firstIntersection = currFunction.intersections.find(int=>int.x>currX)
+        var firstIntersection = currFunction.intersections.find(int=>int.x>currX)
         if (firstIntersection==null) {
             break
-        } else {
-            currX = firstIntersection.x
-            currSym = firstIntersection.symbol
-            lowerEnv += currSym
         }
+        currX = firstIntersection.x
+        currSym = firstIntersection.symbol
+        lowerEnv += currSym
     }
-    console.log(lowerEnv)
     return lowerEnv
 }
 
