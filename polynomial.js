@@ -181,7 +181,6 @@ function toCubicLP(sequence) {
     addBeginningConstraints(lp, symbols)
     addDifferenceConstraints(lp, sequence, pairs)
     addIntersectionConstraints(lp, pairs, intersectionIntervals)
-    //addLinearEndConstraints(lp, sequence)
     makeAllVariablesFree(lp, symbols, 3)
 
     return lp

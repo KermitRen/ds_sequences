@@ -158,8 +158,21 @@ function pruneReverse(seqList) {
     })
 }
 
-function pruneForCubic(seqList, n) {
-   return pruneReverse(prunelowerOrderSequences(seqList, n, 3))
+function pruneForCubic(seqList) {
+    if (seqList.length <= 1) {
+        return seqList
+    }
+    var longestSequence = seqList[seqList.length-1]
+    var prunedSeqs = []
+    for (var i = 0; i < seqList.length-1; i++) {
+        if (!util.isNonContiguousSubsequence(seqList[i], longestSequence)) {
+            prunedSeqs.push(seqList[i])
+        }
+    }
+    var results = pruneForCubic(prunedSeqs)
+    results.push(longestSequence)
+    return results
+   //return pruneReverse(prunelowerOrderSequences(seqList, n, 3))
 }
 
 function pruneRedundantSequences(seqList) {

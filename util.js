@@ -243,7 +243,19 @@ function printEndPointsOfLinesegmentsExcel(solution, sequence, breakpoints) {
     console.log(str)
 }
 
+function isNonContiguousSubsequence(testSeq, baseSeq) {
+    for (var i = 0; i < testSeq.length; i++) {
+        const symbol = testSeq[i]
+        const index = baseSeq.indexOf(symbol)
+        if (index == -1) {
+            return false
+        }
+        baseSeq = baseSeq.slice(index+1)
+    }
+    return true
+}
+
 module.exports = {logError, logPositive, keepCharacters, alternatingString,
                   badPattern, isEquivalent, reverseString, padToLength, getUniqueSymbols,
                   getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch, 
-                  getIntersectionIntervals, getVariables, symbols, polynomialToString,printEndPointsOfLinesegmentsExcel}
+                  getIntersectionIntervals, getVariables, symbols, polynomialToString,printEndPointsOfLinesegmentsExcel, isNonContiguousSubsequence}
