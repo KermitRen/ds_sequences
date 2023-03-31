@@ -135,6 +135,18 @@ function addLinearEndConstraints(lp, sequence) {
     }
 }
 
+function addRelaxedLEConstraints(lp, sequence, symbols) {
+    for(var i = 0; i < sequence.length; i++) {
+        const symbol = sequence[i]
+        symbols.forEach(other => {
+            if(other != symbol) {
+                const constraint = {left: symbol, right: other, op: '<', x: i}
+                lp.addPointConstraint(constraint)
+            }
+        })
+    }
+}
+
 function makeAllVariablesFree(lp, symbols, order) {
     for(var i = 1; i < symbols.length; i++) {
         for(var j = 0; j <= order; j++) {
@@ -181,6 +193,15 @@ function toCubicLP(sequence) {
     addBeginningConstraints(lp, symbols)
     addDifferenceConstraints(lp, sequence, pairs)
     addIntersectionConstraints(lp, pairs, intersectionIntervals)
+    makeAllVariablesFree(lp, symbols, 3)
+    return lp
+}
+
+function toRelaxedCubicLP(sequence) {
+    var lp = new lp_poly_builder(sequence.length, 3)
+    var symbols = util.getUniqueSymbols(sequence)
+
+    addRelaxedLEConstraints(lp, sequence, symbols)
     makeAllVariablesFree(lp, symbols, 3)
 
     return lp
@@ -274,4 +295,5 @@ function computeLowerEnvelope(solution, degree) {
     return lowerEnv
 }
 
-module.exports = {toQuadraticLP, toLineLP, toCubicLP, printPolynomials, computeLowerEnvelope}
+module.exports = {toQuadraticLP, toLineLP, toCubicLP, toRelaxedCubicLP,
+                  printPolynomials, computeLowerEnvelope}

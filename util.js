@@ -258,4 +258,5 @@ function isNonContiguousSubsequence(testSeq, baseSeq) {
 module.exports = {logError, logPositive, keepCharacters, alternatingString,
                   badPattern, isEquivalent, reverseString, padToLength, getUniqueSymbols,
                   getOccurenceMap, sortString, getAllPairs, toCanonical, binarySearch, 
-                  getIntersectionIntervals, getVariables, symbols, polynomialToString,printEndPointsOfLinesegmentsExcel, isNonContiguousSubsequence}
+                  getIntersectionIntervals, getVariables, symbols, polynomialToString,
+                  printEndPointsOfLinesegmentsExcel, isNonContiguousSubsequence}

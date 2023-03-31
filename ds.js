@@ -144,10 +144,6 @@ function isDSseq(sequence, n, s, log = false) {
     return true
 }
 
-function prunelowerOrderSequences(seqList, n, s) {
-    return seqList.filter(seq => !isDSseq(seq, n, s - 1))
-}
-
 function pruneReverse(seqList) {
     return seqList.filter( s => {
         if(s == util.toCanonical(util.reverseString(s))) {
@@ -158,7 +154,7 @@ function pruneReverse(seqList) {
     })
 }
 
-function pruneForCubic(seqList) {
+function pruneContiguous(seqList) {
     if (seqList.length <= 1) {
         return seqList
     }
@@ -169,34 +165,34 @@ function pruneForCubic(seqList) {
             prunedSeqs.push(seqList[i])
         }
     }
-    var results = pruneForCubic(prunedSeqs)
+    var results = pruneContiguous(prunedSeqs)
     results.push(longestSequence)
     return results
-   //return pruneReverse(prunelowerOrderSequences(seqList, n, 3))
 }
 
-function pruneRedundantSequences(seqList) {
-    results = []
-    sequences = [...seqList]
-    var removed = 0
-    for(var i = 0; i < seqList.length; i++) {
-        var seq = sequences[i - removed]
-        var isRedundant = sequences.some(e => {
-            if(e == seq) { return false}
-            return util.isEquivalent(util.reverseString(seq), e) ||
-                   util.isEquivalent(seq, e.slice(0, -1)) ||
-                   util.isEquivalent(seq, e.slice(1, e.length))
-        })
-        if(isRedundant) {
-            sequences.splice(i - removed, 1)
-            removed++
-        } else {
-            results.push(seq)
+function genDSseqTotalPruning(n, s) {
+    var queue = [{seq:"",count:0}]
+    var results = []
+    while(queue.length != 0) {
+        var element = queue.shift()
+        const validSymbols = symbols.slice(0, Math.min(n, element.count+1))
+        var isLeaf = true
+        for(var i=0; i < validSymbols.length; i++) {
+            if(element.seq.slice(-1) == validSymbols[i]) { continue }
+            var newSequence = element.seq + validSymbols[i]
+            var newCount = Math.min(n, element.count+(i == validSymbols.length - 1 ? 1 : 0))
+            if(newSequence.length < s + 2 || isDSseqFast(newSequence, newCount, s)) {
+                isLeaf = false
+                queue.push({seq:newSequence, count: newCount})
+            }
+        }
+        if(isLeaf) {
+            results.push(element.seq)
         }
     }
-
+    results = pruneReverse(results)
+    results = pruneContiguous(results)
     return results
 }
 
-module.exports = {symbols, genDSseq, isDSseq, pruneRedundantSequences, genDSseqPruned,
-                  prunelowerOrderSequences, pruneReverse, pruneForCubic}
+module.exports = {symbols, genDSseq, isDSseq, genDSseqPruned, pruneReverse, genDSseqTotalPruning}
