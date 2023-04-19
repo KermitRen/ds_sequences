@@ -24,6 +24,8 @@ const FuncType = {
     QUADRATIC: 1,
     CUBIC: 2,
     RELAXEDCUBIC: 3,
+    RELAXEDQUARTIC: 4,
+    RELAXEDQUINTIC: 5
 }
 
 async function realizationTest(n, funcType, randomize = true, maxIterations = 10000) {
@@ -37,7 +39,13 @@ async function realizationTest(n, funcType, randomize = true, maxIterations = 10
         util.logPositive("\nAttempting to realize all DS(" + n + ", 3)-Sequenecs as cubic functions"); break
         case FuncType.RELAXEDCUBIC: 
         util.logPositive("\nAttempting to realize all DS(" + n + ", 3)-Sequenecs as a non-contiguous")
-        util.logPositive("lower envelope sequence of cubic functions")
+        util.logPositive("lower envelope sequence of cubic functions"); break
+        case FuncType.RELAXEDQUARTIC: 
+        util.logPositive("\nAttempting to realize all DS(" + n + ", 4)-Sequenecs as a non-contiguous")
+        util.logPositive("lower envelope sequence of quartic functions"); break
+        case FuncType.RELAXEDQUINTIC: 
+        util.logPositive("\nAttempting to realize all DS(" + n + ", 5)-Sequenecs as a non-contiguous")
+        util.logPositive("lower envelope sequence of quintic functions")
     }
     var DSSequences
     switch (funcType) {
@@ -45,6 +53,8 @@ async function realizationTest(n, funcType, randomize = true, maxIterations = 10
         case FuncType.QUADRATIC: DSSequences = ds.pruneReverse(ds.genDSseq(n,2)); break
         case FuncType.CUBIC: DSSequences = ds.pruneReverse(ds.genDSseq(n,3)); break
         case FuncType.RELAXEDCUBIC: DSSequences = ds.genDSseqTotalPruning(n, 3); break
+        case FuncType.RELAXEDQUARTIC: DSSequences = ds.genDSseqTotalPruning(n, 4); break
+        case FuncType.RELAXEDQUINTIC: DSSequences = ds.genDSseqTotalPruning(n, 5); break
     }
     util.logPositive(DSSequences)
     var infeasibleSequences = []
@@ -58,6 +68,8 @@ async function realizationTest(n, funcType, randomize = true, maxIterations = 10
             case FuncType.QUADRATIC: lp_builder = poly.toQuadraticLP(DSSequences[i]); break
             case FuncType.CUBIC: lp_builder = poly.toCubicLP(DSSequences[i]); break
             case FuncType.RELAXEDCUBIC: lp_builder = poly.toRelaxedCubicLP(DSSequences[i]); break
+            case FuncType.RELAXEDQUARTIC: lp_builder = poly.toRelaxedQuarticLP(DSSequences[i]); break
+            case FuncType.RELAXEDQUINTIC: lp_builder = poly.toRelaxedQuinticLP(DSSequences[i]); break
         }
         var lp = lp_builder.getProgram()
         var solution = await lp_solver.solveLP(lp, log = false)
@@ -85,15 +97,19 @@ async function realizationTest(n, funcType, randomize = true, maxIterations = 10
         var counter = 0
         var lp_builder
         switch (funcType) {
-            case FuncType.LINESEGMENT: lp_builder = ls.toLineSegmentLP(DSSequences[i]); break
-            case FuncType.QUADRATIC: lp_builder = poly.toQuadraticLP(DSSequences[i]); break
-            case FuncType.CUBIC: lp_builder = poly.toCubicLP(DSSequences[i]); break
-            case FuncType.RELAXEDCUBIC: lp_builder = poly.toRelaxedCubicLP(DSSequences[i]); break
+            case FuncType.LINESEGMENT: lp_builder = ls.toLineSegmentLP(infeasibleSequences[i]); break
+            case FuncType.QUADRATIC: lp_builder = poly.toQuadraticLP(infeasibleSequences[i]); break
+            case FuncType.CUBIC: lp_builder = poly.toCubicLP(infeasibleSequences[i]); break
+            case FuncType.RELAXEDCUBIC: lp_builder = poly.toRelaxedCubicLP(infeasibleSequences[i]); break
+            case FuncType.RELAXEDQUARTIC: lp_builder = poly.toRelaxedQuarticLP(infeasibleSequences[i]); break
+            case FuncType.RELAXEDQUINTIC: lp_builder = poly.toRelaxedQuinticLP(infeasibleSequences[i]); break
         }
         lp_builder.randomizeXCoordinates()
         var randomLP = lp_builder.getProgram()
+        util.logPositive(infeasibleSequences[i])
         var solution = await lp_solver.solveLP(randomLP)
         while (solution.Status != "Optimal" && counter < maxIterations) {
+            console.log(counter)
             lp_builder.randomizeXCoordinates()
             randomLP = lp_builder.getProgram()
             solution = await lp_solver.solveLP(randomLP)
@@ -115,14 +131,17 @@ async function realizationTest(n, funcType, randomize = true, maxIterations = 10
 }
 
 async function test() {
-    const str = "ABACACBC"
-    const lp_builder = poly.toRelaxedCubicLP(str)
+    const str = "ABABCBCDCDCBABDBD"
+    const lp_builder = poly.toRelaxedQuinticLP(str)
     var lp = lp_builder.getProgram()
+    util.logPositive(lp)
     var solution = await lp_solver.solveLP(lp)
     var counter = 0
     while(solution.Status != "Optimal") {
         lp_builder.randomizeXCoordinates()
         var lp = lp_builder.getProgram()
+        util.logError(lp)
+        util.logError(counter)
         var solution = await lp_solver.solveLP(lp)
         counter++
         if(counter%10000 == 0) {
@@ -132,11 +151,15 @@ async function test() {
     console.log(solution.Status)
     console.log(counter)
     console.log()
-    poly.printPolynomials(solution, 3)
+    //ls.printLineSegments(solution, str, lp_builder)
+    poly.printPolynomials(solution, 5)
 }
 
 
 //var seqs = ds.genDSseqTotalPruning(6,3)
 //util.logPositive(seqs.length)
+//var seqs = ds.genDSseqTotalPruning(4, 5)
+//util.logPositive(seqs.length)
 
-realizationTest(5, FuncType.RELAXEDCUBIC)
+realizationTest(4, FuncType.RELAXEDQUINTIC, true, 1)
+//test()

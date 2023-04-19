@@ -23,7 +23,7 @@ class lp_poly_builder {
     randomizeXCoordinates() {
         var newCoordinates = [0, 1]
         for(var i = 2; i < this.coordinates.length; i++) {
-            var diff = Math.random()*10
+            var diff = Math.random()*1
             newCoordinates.push(newCoordinates[i-1]+diff)
         }
         this.coordinates = newCoordinates
@@ -207,6 +207,24 @@ function toRelaxedCubicLP(sequence) {
     return lp
 }
 
+function toRelaxedQuarticLP(sequence) {
+    var lp = new lp_poly_builder(sequence.length, 4)
+    var symbols = util.getUniqueSymbols(sequence)
+
+    addRelaxedLEConstraints(lp, sequence, symbols)
+    makeAllVariablesFree(lp, symbols, 4)
+    return lp
+}
+
+function toRelaxedQuinticLP(sequence) {
+    var lp = new lp_poly_builder(sequence.length, 5)
+    var symbols = util.getUniqueSymbols(sequence)
+
+    addRelaxedLEConstraints(lp, sequence, symbols)
+    makeAllVariablesFree(lp, symbols, 5)
+    return lp
+}
+
 function computeLowerEnvelope(solution, degree) {
     var variables = util.getVariables(solution)
 
@@ -296,4 +314,5 @@ function computeLowerEnvelope(solution, degree) {
 }
 
 module.exports = {toQuadraticLP, toLineLP, toCubicLP, toRelaxedCubicLP,
-                  printPolynomials, computeLowerEnvelope}
+                  printPolynomials, computeLowerEnvelope, toRelaxedQuarticLP,
+                  toRelaxedQuinticLP}
