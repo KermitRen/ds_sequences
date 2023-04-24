@@ -3,6 +3,7 @@ const ds = require("./ds")
 const lp_solver = require("./lp_solver")
 const ls = require("./line_segment")
 const poly = require("./polynomial")
+const construction = require("./construction")
 
 function gatherData(n, s) {
     var DSData = ds.genDSseqPruned(n, s, verbose = true)
@@ -161,5 +162,14 @@ async function test() {
 //var seqs = ds.genDSseqTotalPruning(4, 5)
 //util.logPositive(seqs.length)
 
-realizationTest(4, FuncType.RELAXEDQUINTIC, true, 1)
+//realizationTest(4, FuncType.RELAXEDQUINTIC, true, 1)
 //test()
+
+//console.log(construction.constructSequence(3,1))
+//console.log(construction.symbolizeSequence(construction.constructSequence(2,3)))
+
+var sequenceObject = construction.constructSequence(3,3)
+var sequence = construction.symbolizeSequence(sequenceObject)
+console.log(sequence)
+console.log(sequence.length)
+console.log(construction.C(3,3))
