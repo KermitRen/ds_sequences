@@ -148,7 +148,7 @@ async function test(str) {
     console.log(solution.Status)
     console.log(counter)
     console.log()
-    //poly.printPolynomials(solution, 3)
+    poly.printPolynomials(solution, 3)
 }
 
 
@@ -163,7 +163,8 @@ async function test(str) {
 //console.log(construction.constructSequence(3,1))
 //console.log(construction.symbolizeSequence(construction.constructSequence(2,3)))
 
-var sequenceObject = construction.constructSequence(3,5)
+var sequenceObject = construction.constructSequence(3,4)
 var sequence = construction.symbolizeSequence(sequenceObject, log = true)
 util.logPositive(sequence)
-//test(sequence) 
+test(sequence) 
+//test("A火水")
