@@ -131,18 +131,14 @@ async function realizationTest(n, funcType, randomize = true, maxIterations = 10
     util.logError(veryInfeasibleSequences)
 }
 
-async function test() {
-    const str = "ABABCBCDCDCBABDBD"
-    const lp_builder = poly.toRelaxedQuinticLP(str)
+async function test(str) {
+    const lp_builder = poly.toRelaxedCubicLP(str)
     var lp = lp_builder.getProgram()
-    util.logPositive(lp)
     var solution = await lp_solver.solveLP(lp)
     var counter = 0
     while(solution.Status != "Optimal") {
         lp_builder.randomizeXCoordinates()
         var lp = lp_builder.getProgram()
-        util.logError(lp)
-        util.logError(counter)
         var solution = await lp_solver.solveLP(lp)
         counter++
         if(counter%10000 == 0) {
@@ -152,8 +148,7 @@ async function test() {
     console.log(solution.Status)
     console.log(counter)
     console.log()
-    //ls.printLineSegments(solution, str, lp_builder)
-    poly.printPolynomials(solution, 5)
+    //poly.printPolynomials(solution, 3)
 }
 
 
@@ -168,8 +163,7 @@ async function test() {
 //console.log(construction.constructSequence(3,1))
 //console.log(construction.symbolizeSequence(construction.constructSequence(2,3)))
 
-var sequenceObject = construction.constructSequence(3,3)
-var sequence = construction.symbolizeSequence(sequenceObject)
-console.log(sequence)
-console.log(sequence.length)
-console.log(construction.C(3,3))
+var sequenceObject = construction.constructSequence(3,5)
+var sequence = construction.symbolizeSequence(sequenceObject, log = true)
+util.logPositive(sequence)
+//test(sequence) 
